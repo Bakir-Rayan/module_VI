@@ -230,6 +230,11 @@ int main( int argc, char** argv )
         waitKey(0);
     }
 
+    Rect ROI = Rect(pt1, pt2);
+    Mat image_roi = image(ROI);
+    imshow("ROI", image_roi);
+    waitKey(0);
+
     int xg, yg;
     cout << "Nombre de colonnes : " << nc << endl; 
     cout << "Nombre de lignes: " << nl << endl; 
@@ -252,19 +257,11 @@ int main( int argc, char** argv )
     xg = xg / compt;
     yg = yg / compt;
     cout << "xg=" << xg << "  yg=" << yg << endl;
-
     Point2f ptc = Point(xg, yg);
-
     circle(image, ptc, 10, Scalar(0, 255, 255), FILLED, LINE_8);
     imshow("centre de gravité", image);
     waitKey(0); 
     imshow("Segmentation 4", clas1);
-    waitKey(0);
-
-
-    Rect ROI = Rect(pt1, pt2);
-    Mat image_roi = image(ROI);
-    imshow("ROI", image_roi);
     waitKey(0);
 
     int lowThreshold = 200;
@@ -273,7 +270,7 @@ int main( int argc, char** argv )
     const int kernel_size = 3;
     blur(image_roi, image_roi, Size(3, 3));
     Canny(image_roi, D, lowThreshold, max_lowThreshold*ratio, kernel_size);
-    imshow("image contour", D);
+    imshow("image_contour", D);
     waitKey(0);
 
     vector<vector<Point> > contours;
@@ -366,6 +363,26 @@ int main( int argc, char** argv )
         }
     }
     imshow("image_LBP", lbpImage);
+    waitKey(0);
+
+    /// calcule de l'histogramme pour l'image au niveau de gris
+    int histSize2 = 256;
+    float range2[] = { 0, 255 };
+    const float* ranges2[] = { range2 };
+    MatND hist2;
+    calcHist(&lbpImage, 1, 0, Mat(), hist2, 1, &histSize2, ranges2,true, false);
+    int hist_w2 = 512; int hist_h2 = 400;
+    int bin_w2 = cvRound((double)hist_w2 / histSize2);
+    Mat histImage2(hist_h2, hist_w2, CV_8UC1, Scalar(255, 255, 255)); 
+    normalize(hist2, hist2, 0, histImage2.rows, NORM_MINMAX, -1, Mat());
+    for (int i = 1; i < histSize2; i++)
+    {
+        line(histImage2, Point(bin_w2 * (i - 1),hist_h2 - cvRound(hist2.at<float>(i - 1))),
+        Point(bin_w2 * (i), hist_h2 -cvRound(hist2.at<float>(i))),
+        Scalar(0, 0, 0), 2, 8, 0);
+    }  
+    namedWindow("hist", WINDOW_AUTOSIZE); 
+    imshow("hist", histImage2);
     waitKey(0);
 
     destroyAllWindows();
