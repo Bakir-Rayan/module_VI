@@ -90,57 +90,6 @@ int main( int argc, char** argv )
     imshow("image seuillee", img);
 
     // Etiquettage
-    Mat etiq(img.rows,img.cols,CV_32F);
-    int k = 1;
-    for (int i = 0; i < img.rows; i++)
-    {
-        for (int j = 0; j < img.cols; j++)
-        {
-            if (img.at<uchar>(i, j) == 0)
-                etiq.at<float>(i, j) = 0.;
-            else
-            {
-                if ((i > 0) && (j > 0))
-                {
-                    if ((img.at < uchar>(i - 1, j) == (uchar)0) && (img.at < uchar>(i, j - 1) == (uchar)0))
-                    {
-                        etiq.at<float>(i, j) = (float)k; 
-                        k++;
-                    }
-                    else
-                    {
-                        etiq.at<float>(i, j) = min_dif_zero(etiq.at<float>(i - 1, j), etiq.at<float>(i, j - 1));
-                    }
-                }
-            }
-        }
-    }
-    cout << "k= " << k << endl;
-    int flag = 1;
-    int iter = 0; 
-    float P[5];  
-    while (flag == 1)
-    {
-        flag = 0;
-        iter++;
-        cout << "iter=" << iter << endl;
-        for (int i = 1; i < img.rows - 1; i++)
-        {
-            for (int j = 1; j < img.cols - 1; j++)
-            {
-                if (etiq.at<float>(i, j) !=0)
-                {
-                    P[0] = etiq.at<float>(i, j); 
-                    P[1] = etiq.at<float>(i - 1, j); 
-                    P[2] = etiq.at<float>(i, j - 1); 
-                    P[3] = etiq.at<float>(i, j + 1); 
-                    P[4] = etiq.at<float>(i + 1, j);
-                    etiq.at<float>(i, j) = min_dif_zero1(P);
-                    if (etiq.at<float>(i, j) != P[0]) flag = 1;
-                }
-            }
-        }
-    }
 
     int C;
     cout << "Donner le nombre de régions :";
@@ -155,7 +104,7 @@ int main( int argc, char** argv )
     vector<uchar>index;
     index.push_back(clas.at<uchar>(0, 0));
     int u;
-    k = 1;
+    int k = 1;
     for (i = 0; i < nl; i++)
     {
         for (j = 0; j < nc; j++)
@@ -203,7 +152,7 @@ int main( int argc, char** argv )
 
 
         i = 0;
-        flag = 0;
+        int flag = 0;
         while ((i < nl) && (flag == 0))
         {
             j = 0;
